@@ -3,17 +3,16 @@ package com.seesawin.controllers;
 
 import com.seesawin.models.ERole;
 import com.seesawin.models.Roles;
-import com.seesawin.models.UserRoles;
 import com.seesawin.models.Users;
 import com.seesawin.payload.request.LoginRequest;
 import com.seesawin.payload.request.SignupRequest;
 import com.seesawin.payload.response.JwtResponse;
 import com.seesawin.payload.response.MessageResponse;
 import com.seesawin.repository.RolesMapper;
-import com.seesawin.repository.UserRolesMapper;
 import com.seesawin.repository.UsersMapper;
 import com.seesawin.security.jwt.JwtUtils;
 import com.seesawin.security.services.UserDetailsImpl;
+import com.seesawin.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,15 +35,15 @@ public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
-    UsersMapper usersMapper;
-    @Autowired
     RolesMapper rolesMapper;
     @Autowired
-    UserRolesMapper userRolesMapper;
+    UsersMapper usersMapper;
     @Autowired
     PasswordEncoder encoder;
     @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    AuthService authService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -69,17 +68,23 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) throws Exception {
         System.out.println(">>>> signup: " + signUpRequest.toString());
 
-        Users users = usersMapper.selectAll().stream().filter(user -> user.getUsername().equals(signUpRequest.getUsername())).findAny().get();
+        Users users = usersMapper.selectAll().stream()
+                .filter(user -> user.getUsername().equals(signUpRequest.getUsername()))
+                .findAny()
+                .orElse(null);
         if (users != null) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        users = usersMapper.selectAll().stream().filter(user -> user.getEmail().equals(signUpRequest.getEmail())).findAny().get();
+        users = usersMapper.selectAll().stream()
+                .filter(user -> user.getEmail().equals(signUpRequest.getEmail()))
+                .findAny()
+                .orElse(null);
         if (users != null) {
             return ResponseEntity
                     .badRequest()
@@ -106,37 +111,29 @@ public class AuthController {
                 switch (role) {
                     case "admin":
                         Roles adminRole = roleList.stream()
-                                .filter(r -> r.getName().equals(ERole.ROLE_ADMIN))
+                                .filter(r -> r.getName().equals(ERole.ROLE_ADMIN.name()))
                                 .findAny().orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
                         break;
                     case "mod":
                         Roles modRole = roleList.stream()
-                                .filter(r -> r.getName().equals(ERole.ROLE_MODERATOR))
+                                .filter(r -> r.getName().equals(ERole.ROLE_MODERATOR.name()))
                                 .findAny().orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(modRole);
                         break;
                     default:
                         Roles userRole = roleList.stream()
-                                .filter(r -> r.getName().equals(ERole.ROLE_USER))
+                                .filter(r -> r.getName().equals(ERole.ROLE_USER.name()))
                                 .findAny().orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
                 }
             });
         }
 
-        this.saveUserAndRoles(user, roles);
+        authService.saveUserAndRoles(user, roles);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    private void saveUserAndRoles(Users user, Set<Roles> roles) {
-        usersMapper.insert(user);
-        roles.forEach(r -> {
-            UserRoles userRoles = new UserRoles();
-            userRoles.setUserId(user.getId());
-            userRoles.setRoleId(r.getId());
-            userRolesMapper.insert(userRoles);
-        });
-    }
+
 }

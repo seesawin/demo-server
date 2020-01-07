@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.type.JdbcType;
 
@@ -18,9 +19,10 @@ public interface RolesMapper {
     int deleteByPrimaryKey(Integer id);
 
     @Insert({
-        "insert into roles (id, name)",
-        "values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})"
+        "insert into roles (name)",
+        "values (#{name,jdbcType=VARCHAR})"
     })
+    @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="id", before=false, resultType=Integer.class)
     int insert(Roles record);
 
     @Select({

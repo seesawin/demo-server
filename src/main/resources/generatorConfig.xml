@@ -238,6 +238,7 @@
                     JDBC      :相当于在生成的insert元素上添加useGeneratedKeys="true"和keyProperty属性
             <generatedKey column="" sqlStatement=""/>
              -->
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 
 			<!--
                 该元素会在根据表中列名计算对象属性名之前先重命名列名，非常适合用于表中的列都有公用的前缀字符串的时候，
@@ -293,6 +294,7 @@
 			<property name="ignoreQualifiersAtRuntime" value="false"/>
 			<property name="immutable" value="false"/>
 			<property name="modelOnly" value="false"/>
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table>
 		<table tableName="user_roles">
 			<property name="constructorBased" value="false"/>
@@ -300,11 +302,6 @@
 			<property name="immutable" value="false"/>
 			<property name="modelOnly" value="false"/>
 		</table>
-
-		<table tableName="users"/>
-		<table tableName="roles"/>
-		<table tableName="user_roles"/>
-
 	</context>
 
 </generatorConfiguration>

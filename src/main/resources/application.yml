@@ -14,15 +14,6 @@ spring:
       initial-size: 5                               # 初始化提供的连接数
       max-total: 5                                  # 最大的连接数
       max-wait-millis: 200                          # 等待连接获取的最大超时时间
-  jpa:
-    show-sql: true
-    hibernate:
-      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-        jdbc.batch_size: 50
 bezkoder:
   app:
     jwtSecret: bezKoderSecretKey

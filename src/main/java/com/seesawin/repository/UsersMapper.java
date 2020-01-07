@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.type.JdbcType;
 
@@ -18,11 +19,12 @@ public interface UsersMapper {
     int deleteByPrimaryKey(Integer id);
 
     @Insert({
-        "insert into users (id, username, ",
-        "password, email)",
-        "values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, ",
-        "#{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR})"
+        "insert into users (username, password, ",
+        "email)",
+        "values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, ",
+        "#{email,jdbcType=VARCHAR})"
     })
+    @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="id", before=false, resultType=Integer.class)
     int insert(Users record);
 
     @Select({
