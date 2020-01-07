@@ -103,7 +103,7 @@ public class AuthController {
         List<Roles> roleList = rolesMapper.selectAll();
         if (strRoles == null) {
             Roles userRole = roleList.stream()
-                    .filter(role -> role.getName().equals(ERole.ROLE_USER))
+                    .filter(role -> role.getName().equals(ERole.ROLE_USER.name()))
                     .findAny().orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         } else {
