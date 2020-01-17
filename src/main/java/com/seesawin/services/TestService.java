@@ -7,22 +7,24 @@ import com.seesawin.repository.UserRolesMapper;
 import com.seesawin.repository.UsersMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
 @Slf4j
+@CacheConfig(cacheNames = "TestService")
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class AuthService {
+public class TestService {
     @Autowired
     UsersMapper usersMapper;
     @Autowired
     UserRolesMapper userRolesMapper;
 
     public void saveUserAndRoles(Users user, Set<Roles> roles) throws Exception {
-        log.info("AuthService.saveUserAndRoles user:{}, roles:{}", user, roles);
         usersMapper.insert(user);
         roles.forEach(r -> {
             UserRoles userRoles = new UserRoles();
@@ -30,5 +32,11 @@ public class AuthService {
             userRoles.setRoleId(r.getId());
             userRolesMapper.insert(userRoles);
         });
+    }
+
+    @Cacheable(key = "'greet'.concat({#key})")
+    public String greet(String key) {
+        log.info("快取內沒有取到，執行service key={}", key);
+        return "world！";
     }
 }
