@@ -302,6 +302,12 @@
 			<property name="immutable" value="false"/>
 			<property name="modelOnly" value="false"/>
 		</table>
+		<table tableName="person">
+			<property name="constructorBased" value="false"/>
+			<property name="ignoreQualifiersAtRuntime" value="false"/>
+			<property name="immutable" value="false"/>
+			<property name="modelOnly" value="false"/>
+		</table>
 	</context>
 
 </generatorConfiguration>
